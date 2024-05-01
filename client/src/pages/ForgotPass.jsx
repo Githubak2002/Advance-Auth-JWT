@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 // import toast from 'react-hot-toast';
 
 // Aimation on scroll - Zoom in animation
@@ -25,9 +26,11 @@ const ForgotPass = () => {
         { email: userEmail}
       );
       if (data) {
-        window.alert("Email sent");
+        // window.alert("Email sent");
+        toast.success("Please Check your Email")
         console.log("Email sent!");
       } else {
+        toast.error("User NOT found!")
         console.log("User NOT found!");
       }
     } catch (error) {

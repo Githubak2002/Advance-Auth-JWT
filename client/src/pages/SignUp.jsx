@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios';
+import toast from 'react-hot-toast';
 // import toast from 'react-hot-toast';
 
 // Aimation on scroll - Zoom in animation
@@ -30,6 +31,7 @@ const SignUp = () => {
       const {data} = await axios.post(`http://localhost:8080/api/v1/users/signup`,{userName:input.name,email:input.email,password:input.password});
       console.log("data is ",data);
       if(data){
+        toast.success(data.msg);
         console.log("User registered");
         navigate('/login');
       }

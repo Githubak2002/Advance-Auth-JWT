@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import axios from "axios";
 // import toast from 'react-hot-toast';
 
@@ -13,6 +14,10 @@ const inputCSS = "border-2 border-black p-2 sm:w-[300px]";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  axios.defaults.withCredentials = true;
+  // allows Axios to include cookies or authentication tokens when making cross-origin requests, enabling access to protected resources across different domains.
+
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -24,23 +29,30 @@ const Login = () => {
 
   const loginUser = async (e) => {
     e.preventDefault();
-    console.log(`User entered data `, input);
+    // console.log(`User entered data `, input);
     try {
       // axios return a res not data therefore destructuring the data obj
       const { data } = await axios.post(
         `http://localhost:8080/api/v1/users/login`,
         { email: input.email, password: input.password }
       );
-      if (data) {
-        console.log(data);
+      // console.log(data);
+      if(data.status) {
         console.log("User Logged in");
+        toast.success('User Logged in successfully');
         navigate("/");
       } else {
         console.log("User NOT logged in!");
         console.log(data.msg);
       }
-    } catch (error) {
-      console.log(`Error in loginUser fun → ${error}`);
+    } 
+    catch (error) {
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.msg);
+        console.log(`Error in loginUser fun → ${error.response.data.msg}`);
+      } else {
+        console.log(`Error in loginUser fun → `,error);
+      }  
     }
   };
 
