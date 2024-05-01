@@ -3,6 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors"
+import cookieParser from "cookie-parser";
 import colors from 'colors';
 
 import { UserRoute } from "./routes/user.js";
@@ -18,6 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cors());
+app.use(cookieParser());
 
 
 /* === static folder === */

@@ -1,6 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { User } from "../models/userModel.js";
+import { User as UserModel } from "../models/userModel.js";
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
@@ -8,54 +10,177 @@ const router = express.Router();
 router.post("/signup", async (req, res) => {
   try {
     const { userName, email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await UserModel.findOne({ email });
     if (user) {
-      return res.status(404).json({ 
-        status:false, 
-        msg: "User already exists" });
+      return res.status(404).json({
+        status: false,
+        msg: "User already exists",
+      });
     }
     const hashPass = await bcrypt.hash(password, 10);
-    const newUser = new User({
+    const newUser = new UserModel({
       userName,
       email,
       password: hashPass,
     });
+
     await newUser.save();
-    return res.status(200).json({ 
-      status:true, 
+
+    return res.status(200).json({
+      status: true,
       msg: "User Registered",
-      newUser
+      newUser,
     });
   } catch (err) {
-    console.log(`Error in signup user - ${err}`)
+    console.log(`Error in signup user router - ${err}`);
   }
 });
 
-// ===== login an existing user =========  JWT remaning
+// ===== login an existing user ========= JWT
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        msg: "User not registered",
+      });
+    }
+    const validPass = await bcrypt.compare(password, user.password);
+    if (!validPass) {
+      return res.status(404).json({
+        status: false,
+        msg: "Email or password is incorrect",
+      });
+    }
+    const token = jwt.sign({ userName: user.userName },process.env.JWT_SECRET,{expiresIn:'1h'});
+    // httpOnly:true - prevent the token from being accessed by client-side scripts
+    res.cookie('token',token,{httpOnly:true,maxAge:360000})
+    return res.json({
+      status:true,
+      msg:"Login successfully"
+    })
+
+
+  } catch (error) {
+    console.log(`Error in login user route → ${error}}`);
+  }
+});
+
+// ===== forgot Password ========= 
+router.post("/forgotPass", async (req,res) => {
+  const {email} = req.body;
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        msg: "User not registered",
+      });
+    }
+
+
+    const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'5m'})
+
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'appylohar@gmail.com',
+        pass: 'aqml kqzt bsmu jnnh'
+      }
+    });
+    
+    var mailOptions = {
+      from: 'appylohar@gmail.com',
+      to: email,
+      subject: 'Reset Password',
+      text: `${process.env.BASE_URL_FRONTEND}/resetPass/${token}`
+    };
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        // console.log(error);
+        return res.status(404).json({status:false,msg:"email NOT sent - ERROR"})
+      } else {
+        console.log('Email sent: ' + info.response);
+        // window.alert("Email sent");
+        return res.status(202).json({status:true,msg:"Reset Pass email sent!"})
+      }
+    });
+
+
+
+
+  } catch (error) {
+    console.log(`Error in forgot pass route → ${error}}`);
+  }
+})
+
+// ====== reset Password ========= 
+router.post("/resetPass/:token", async (req, res) => {
+  const { token } = req.params;
+  const { newPass } = req.body;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const id = decoded.id;
+
+    console.log("Backend decoded - ".bgBlack.white, decoded);
+
+    const hashPass = await bcrypt.hash(newPass,10);
+
+    const updatedUser = await UserModel.findByIdAndUpdate(id, { password: hashPass }, { new: true });
+
+    if (!updatedUser) {
+      console.log(`Error updating password → ${err}`);
+      return res.status(404).json({
+        status: false,
+        msg: "Invalid token or password update failed",
+      });
+    }
+    return res.status(202).json({
+      status: true,
+      msg: "Password updated!",
+    });
+  } catch (error) {
+    console.log(`Error in reset pass route → ${error}`);
+    return res.status(404).json({
+      status: false,
+      msg: "Invalid token",
+    });
+  }
+});
+
+// ===== login an existing user =========  without JWT
+/** 
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if(!user){
-      return res.status(404).json({ 
-        status:false, 
-        msg: "User NOT found/registered!" });
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        msg: "User NOT found/registered!",
+      });
     }
-    const validPass = await bcrypt.compare(password,user.password);
-    if(!validPass){
-      return res.status(404).json({ 
-        status:false, 
-        msg: "Incorrect Email/password" });
+    const validPass = await bcrypt.compare(password, user.password);
+    if (!validPass) {
+      return res.status(404).json({
+        status: false,
+        msg: "Incorrect Email/password",
+      });
     }
     // await newUser.save();
-    return res.status(200).json({ 
-      status:true, 
+    return res.status(200).json({
+      status: true,
       msg: "User Logged in",
     });
   } catch (err) {
-    console.log(`Error in login user - ${err}`)
+    console.log(`Error in login user - ${err}`);
   }
 });
+*/
 
 
 export { router as UserRoute };

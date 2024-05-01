@@ -11,14 +11,13 @@
 
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import "./index.css";
+import { createBrowserRouter, RouterProvider} from "react-router-dom";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import ForgotPass from "./pages/ForgotPass";
+import "./index.css";
+import ResetPass from "./pages/ResetPass";
 
 const router = createBrowserRouter([
   {
@@ -34,8 +33,12 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "/",
-    element: <div>Hello world!</div>,
+    path: "/forgotPass",
+    element: <ForgotPass />
+  },
+  {
+    path: "/resetPass/:token",
+    element: <ResetPass />
   },
 ]);
 

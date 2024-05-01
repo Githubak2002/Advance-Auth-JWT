@@ -1,0 +1,13 @@
+Client and Server folder
+  cd client - Setup Vite js and tailwind css
+  cd server -
+    npm init -y
+    npm install express mongoose nodemon bcrypt jsonwebtoken cors dotenv cookie-parser 
+    devDependencies - nodemon dotenv morgan?
+
+
+Add a script in package.json - “start” : “nodemon index.js”
+Add/Change - “type” : “module”		// import express from “express”
+
+
+Setting .env - PORT = 8080 and mongoDB url, etc…

@@ -9,7 +9,7 @@ import axios from 'axios';
 // AOS.init();
 
 const baseURl = import.meta.env.VITE_BACKEND_BASE_URL;
-const inputCSS = "border-2 border-black p-2";
+const inputCSS = "border-2 border-black p-2 sm:w-[300px]";
 const SignUp = () => {
 
   const navigate = useNavigate();

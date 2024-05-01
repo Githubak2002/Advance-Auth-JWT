@@ -6,9 +6,10 @@ const Home = () => {
   return (
     <section className='flexCenter flex-col h-screen gap-6 text-4xl'>
       <Link to='/signup'>SignUp</Link>
-      <Link to='/logon'>Login</Link>
+      <Link to='/login'>Login</Link>
     </section>
   )
 }
 
 export default Home
+
