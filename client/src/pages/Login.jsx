@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -13,6 +13,34 @@ const baseURl = import.meta.env.VITE_BACKEND_BASE_URL;
 const inputCSS = "border-2 border-black p-2 sm:w-[300px]";
 
 const Login = () => {
+
+
+
+
+
+  // const [user,setUser] = useState('');
+  // useEffect(()=>{
+    
+  //   const cookies = document.cookie.split(';');
+  //   console.log(cookies);
+  //   let loginToken = '';
+  //   for (let i = 0; i < cookies.length; i++) {
+  //     const cookie = cookies[i].trim();
+  //     if (cookie.startsWith('LoginToken=')) {
+  //       loginToken = cookie.substring('LoginToken='.length, cookie.length);
+  //       break;
+  //     }
+  //   }
+  //   console.log(cookies);
+
+  // },[loginUser]);
+
+
+
+
+
+
+
   const navigate = useNavigate();
 
   axios.defaults.withCredentials = true;

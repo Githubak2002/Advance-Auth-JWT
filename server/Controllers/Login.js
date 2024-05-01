@@ -28,7 +28,7 @@ const LoginController = async (req,res) => {
     );
     // httpOnly:true - prevent the token from being accessed by client-side scripts
     // res.cookie("token", token, { httpOnly: true, maxAge: 360000 });
-    res.cookie("token", token, {  maxAge: 360000 });
+    res.cookie("LoginToken", token, {  maxAge: 360000 });
     return res.json({
       status: true,
       msg: "Login successfully",

@@ -26,7 +26,7 @@ const ForgotPass = () => {
         { email: userEmail}
       );
       if (data) {
-        // window.alert("Email sent");
+        window.alert("Email sent - Please Check your Email to RESET password");
         toast.success("Please Check your Email")
         console.log("Email sent!");
       } else {

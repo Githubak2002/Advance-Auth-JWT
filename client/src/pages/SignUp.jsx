@@ -28,7 +28,7 @@ const SignUp = () => {
     e.preventDefault();
     console.log(`User data `, input);
     try {
-      const {data} = await axios.post(`http://localhost:8080/api/v1/users/signup`,{userName:input.name,email:input.email,password:input.password});
+      const {data} = await axios.post(`${baseURl}/api/v1/users/signup`,{userName:input.name,email:input.email,password:input.password});
       console.log("data is ",data);
       if(data){
         toast.success(data.msg);
@@ -36,10 +36,15 @@ const SignUp = () => {
         navigate('/login');
       }
       else{
+        toast.error(data.msg);
         console.log("User NOT registered");
       }
-    } catch (error) {
-      console.log(`Error in registerUser fun → ${error}`);
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.msg) {
+        toast.error(err.response.data.msg);
+      } else {
+        console.log(`Error in registerUser fun → `, err);
+      }
     }
   }
 

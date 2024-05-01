@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-// import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Aimation on scroll - Zoom in animation
 // import 'aos/dist/aos.css';
@@ -27,6 +27,7 @@ const ResetPass = () => {
       );
       console.log("Data from pass Reset route - ",data);
       if (data) {
+        toast.success(data.msg);
         console.log("Password Reset Successfully!");
         navigate('/login');
       } else {

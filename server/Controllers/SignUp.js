@@ -6,9 +6,9 @@ const SignUpController = async (req,res) => {
     const { userName, email, password } = req.body;
     const user = await UserModel.findOne({ email });
     if (user) {
-      return res.status(404).json({
+      return res.status(400).json({
         status: false,
-        msg: "User already exists",
+        msg: "User with this Email already exists",
       });
     }
     const hashPass = await bcrypt.hash(password, 10);
@@ -26,10 +26,11 @@ const SignUpController = async (req,res) => {
       newUser,
     });
   } catch (err) {
-    console.log(`Error in signup user router - ${err}`);
-    return res.status(404).json({
+    // console.log(`Error in signup user router - ${err}`);
+    return res.status(500).json({
       status: false,
-      msg: "Error in signing up",
+      msg: "Error in signing up ROUTE -",
+      err
     });
   }
 }

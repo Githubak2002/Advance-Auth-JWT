@@ -13,6 +13,13 @@ Add/Change - “type” : “module”		// import express from “express”
 Setting .env - PORT = 8080 and mongoDB url, etc…
 
 
+======================== JWT methods ========================
+1. jwt.verify: When you jwt.verify a token, you are checking if the token is valid and has not been tampered with. It ensures the token's signature is correct, and if the token has an expiration time, audience, or issuer, it verifies those too. If everything checks out, it means the token is authentic and can be trusted for authentication purposes.
+
+2. jwt.decode: Decoding a token with jwt.decode simply means extracting the information (claims) stored in the token without verifying its signature. It's like reading the contents of the token without confirming if it's trustworthy. This method is suitable for trusted messages but should not be used for untrusted sources.
+
+3. jwt.sign: When you jwt.sign a token, you are creating a new token by adding a signature to it. This signature ensures the token's integrity and authenticity. It's like putting a stamp on a letter to prove it's from you. The signed token can then be used for secure communication and authentication.
+
 
 
 
