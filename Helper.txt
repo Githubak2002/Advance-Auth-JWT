@@ -11,3 +11,37 @@ Add/Change - “type” : “module”		// import express from “express”
 
 
 Setting .env - PORT = 8080 and mongoDB url, etc…
+
+
+
+
+
+// ===== login an existing user =========  without JWT
+/** 
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        msg: "User NOT found/registered!",
+      });
+    }
+    const validPass = await bcrypt.compare(password, user.password);
+    if (!validPass) {
+      return res.status(404).json({
+        status: false,
+        msg: "Incorrect Email/password",
+      });
+    }
+    // await newUser.save();
+    return res.status(200).json({
+      status: true,
+      msg: "User Logged in",
+    });
+  } catch (err) {
+    console.log(`Error in login user - ${err}`);
+  }
+});
+*/

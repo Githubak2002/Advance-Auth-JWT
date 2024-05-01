@@ -3,40 +3,17 @@ import bcrypt from "bcrypt";
 import { User as UserModel } from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import SignUpController from "../Controllers/SignUp.js";
+import LoginController from "../Controllers/Login.js";
 
 const router = express.Router();
 
 // ===== register a new user =========
-router.post("/signup", async (req, res) => {
-  try {
-    const { userName, email, password } = req.body;
-    const user = await UserModel.findOne({ email });
-    if (user) {
-      return res.status(404).json({
-        status: false,
-        msg: "User already exists",
-      });
-    }
-    const hashPass = await bcrypt.hash(password, 10);
-    const newUser = new UserModel({
-      userName,
-      email,
-      password: hashPass,
-    });
-
-    await newUser.save();
-
-    return res.status(200).json({
-      status: true,
-      msg: "User Registered",
-      newUser,
-    });
-  } catch (err) {
-    console.log(`Error in signup user router - ${err}`);
-  }
-});
+router.post("/signup", SignUpController);
 
 // ===== login an existing user ========= JWT
+// router.post("/login", LoginController)
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -54,23 +31,26 @@ router.post("/login", async (req, res) => {
         msg: "Email or password is incorrect",
       });
     }
-    const token = jwt.sign({ userName: user.userName },process.env.JWT_SECRET,{expiresIn:'1h'});
+    const token = jwt.sign(
+      { userName: user.userName },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
     // httpOnly:true - prevent the token from being accessed by client-side scripts
-    res.cookie('token',token,{httpOnly:true,maxAge:360000})
+    // res.cookie("token", token, { httpOnly: true, maxAge: 360000 });
+    res.cookie("token", token, {  maxAge: 360000 });
     return res.json({
-      status:true,
-      msg:"Login successfully"
-    })
-
-
+      status: true,
+      msg: "Login successfully",
+    });
   } catch (error) {
     console.log(`Error in login user route → ${error}}`);
   }
 });
 
-// ===== forgot Password ========= 
-router.post("/forgotPass", async (req,res) => {
-  const {email} = req.body;
+// ===== forgot Password =========
+router.post("/forgotPass", async (req, res) => {
+  const { email } = req.body;
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -80,45 +60,45 @@ router.post("/forgotPass", async (req,res) => {
       });
     }
 
-
-    const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'5m'})
-
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "5m",
+    });
 
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'appylohar@gmail.com',
-        pass: 'aqml kqzt bsmu jnnh'
-      }
+        user: "appylohar@gmail.com",
+        pass: "aqml kqzt bsmu jnnh",
+      },
     });
-    
+
     var mailOptions = {
-      from: 'appylohar@gmail.com',
+      from: "appylohar@gmail.com",
       to: email,
-      subject: 'Reset Password',
-      text: `${process.env.BASE_URL_FRONTEND}/resetPass/${token}`
+      subject: "Reset Password",
+      text: `${process.env.BASE_URL_FRONTEND}/resetPass/${token}`,
     };
-    
-    transporter.sendMail(mailOptions, function(error, info){
+
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         // console.log(error);
-        return res.status(404).json({status:false,msg:"email NOT sent - ERROR"})
+        return res
+          .status(404)
+          .json({ status: false, msg: "email NOT sent - ERROR" });
       } else {
-        console.log('Email sent: ' + info.response);
+        console.log("Email sent: " + info.response);
         // window.alert("Email sent");
-        return res.status(202).json({status:true,msg:"Reset Pass email sent!"})
+        return res
+          .status(202)
+          .json({ status: true, msg: "Reset Pass email sent!" });
       }
     });
-
-
-
-
   } catch (error) {
     console.log(`Error in forgot pass route → ${error}}`);
   }
-})
+});
 
-// ====== reset Password ========= 
+// ====== reset Password =========
 router.post("/resetPass/:token", async (req, res) => {
   const { token } = req.params;
   const { newPass } = req.body;
@@ -128,9 +108,13 @@ router.post("/resetPass/:token", async (req, res) => {
 
     console.log("Backend decoded - ".bgBlack.white, decoded);
 
-    const hashPass = await bcrypt.hash(newPass,10);
+    const hashPass = await bcrypt.hash(newPass, 10);
 
-    const updatedUser = await UserModel.findByIdAndUpdate(id, { password: hashPass }, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { password: hashPass },
+      { new: true }
+    );
 
     if (!updatedUser) {
       console.log(`Error updating password → ${err}`);
@@ -151,36 +135,5 @@ router.post("/resetPass/:token", async (req, res) => {
     });
   }
 });
-
-// ===== login an existing user =========  without JWT
-/** 
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        status: false,
-        msg: "User NOT found/registered!",
-      });
-    }
-    const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass) {
-      return res.status(404).json({
-        status: false,
-        msg: "Incorrect Email/password",
-      });
-    }
-    // await newUser.save();
-    return res.status(200).json({
-      status: true,
-      msg: "User Logged in",
-    });
-  } catch (err) {
-    console.log(`Error in login user - ${err}`);
-  }
-});
-*/
-
 
 export { router as UserRoute };

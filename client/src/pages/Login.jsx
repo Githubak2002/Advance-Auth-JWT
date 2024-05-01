@@ -26,15 +26,18 @@ const Login = () => {
     e.preventDefault();
     console.log(`User entered data `, input);
     try {
+      // axios return a res not data therefore destructuring the data obj
       const { data } = await axios.post(
         `http://localhost:8080/api/v1/users/login`,
         { email: input.email, password: input.password }
       );
       if (data) {
+        console.log(data);
         console.log("User Logged in");
         navigate("/");
       } else {
         console.log("User NOT logged in!");
+        console.log(data.msg);
       }
     } catch (error) {
       console.log(`Error in loginUser fun → ${error}`);
@@ -78,7 +81,7 @@ const Login = () => {
 
         <div className="flex">
           <h2>
-            Not registered? {" "}
+            Not registered?{" "}
             <span
               className="hover:cursor-pointer text-blue-600"
               onClick={() => navigate("/signup")}
@@ -87,8 +90,9 @@ const Login = () => {
             </span>
           </h2>
         </div>
-        <Link className="hover:cursor-pointer text-blue-600" to="/forgotPass">Forgot Password?</Link>
-
+        <Link className="hover:cursor-pointer text-blue-600" to="/forgotPass">
+          Forgot Password?
+        </Link>
       </form>
     </main>
   );
